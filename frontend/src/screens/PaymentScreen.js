@@ -12,7 +12,7 @@ function PaymentScreen({ history }) {
 
     const dispatch = useDispatch()
 
-    const [paymentMethod, setPaymentMethod] = useState('PayPal')
+    const [paymentMethod, setPaymentMethod] = useState('Pix')
 
     if (!shippingAddress.address) {
         history.push('/shipping')
@@ -34,10 +34,35 @@ function PaymentScreen({ history }) {
                     <Col>
                         <Form.Check
                             type='radio'
-                            label='PayPal or Credit Card'
-                            id='paypal'
+                            label='Pix'
+                            id='pix'
                             name='paymentMethod'
-                            checked
+                            value='Pix'
+                            checked={paymentMethod === 'Pix'}
+                            onChange={(e) => setPaymentMethod(e.target.value)}
+                        >
+
+                        </Form.Check>
+
+                        <Form.Check
+                            type='radio'
+                            label='Cartao de Credito'
+                            id='credit-card'
+                            name='paymentMethod'
+                            value='Cartao de Credito'
+                            checked={paymentMethod === 'Cartao de Credito'}
+                            onChange={(e) => setPaymentMethod(e.target.value)}
+                        >
+
+                        </Form.Check>
+
+                        <Form.Check
+                            type='radio'
+                            label='Boleto'
+                            id='boleto'
+                            name='paymentMethod'
+                            value='Boleto'
+                            checked={paymentMethod === 'Boleto'}
                             onChange={(e) => setPaymentMethod(e.target.value)}
                         >
 

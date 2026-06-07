@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { Button, Row, Col, ListGroup, Image, Card } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { PayPalButton } from 'react-paypal-button-v2'
 import Message from '../components/Message'
 import Loader from '../components/Loader'
 import { getOrderDetails, payOrder, deliverOrder } from '../actions/orderActions'
@@ -12,8 +11,6 @@ function OrderScreen({ match, history }) {
     const orderId = match.params.id
     const dispatch = useDispatch()
 
-
-    const [sdkReady, setSdkReady] = useState(false)
 
     const orderDetails = useSelector(state => state.orderDetails)
     const { order, error, loading } = orderDetails
@@ -32,18 +29,6 @@ function OrderScreen({ match, history }) {
         order.itemsPrice = order.orderItems.reduce((acc, item) => acc + item.price * item.qty, 0).toFixed(2)
     }
 
-
-    const addPayPalScript = () => {
-        const script = document.createElement('script')
-        script.type = 'text/javascript'
-        script.src = 'https://www.paypal.com/sdk/js?client-id=AeDXja18CkwFUkL-HQPySbzZsiTrN52cG13mf9Yz7KiV2vNnGfTDP0wDEN9sGlhZHrbb_USawcJzVDgn'
-        script.async = true
-        script.onload = () => {
-            setSdkReady(true)
-        }
-        document.body.appendChild(script)
-    }
-
     useEffect(() => {
 
         if (!userInfo) {
@@ -55,18 +40,15 @@ function OrderScreen({ match, history }) {
             dispatch({ type: ORDER_DELIVER_RESET })
 
             dispatch(getOrderDetails(orderId))
-        } else if (!order.isPaid) {
-            if (!window.paypal) {
-                addPayPalScript()
-            } else {
-                setSdkReady(true)
-            }
         }
     }, [dispatch, order, orderId, successPay, successDeliver])
 
 
-    const successPaymentHandler = (paymentResult) => {
-        dispatch(payOrder(orderId, paymentResult))
+    const paymentHandler = () => {
+        dispatch(payOrder(orderId, {
+            paymentMethod: order.paymentMethod,
+            status: 'COMPLETED',
+        }))
     }
 
     const deliverHandler = () => {
@@ -188,14 +170,13 @@ function OrderScreen({ match, history }) {
                                         <ListGroup.Item>
                                             {loadingPay && <Loader />}
 
-                                            {!sdkReady ? (
-                                                <Loader />
-                                            ) : (
-                                                    <PayPalButton
-                                                        amount={order.totalPrice}
-                                                        onSuccess={successPaymentHandler}
-                                                    />
-                                                )}
+                                            <Button
+                                                type='button'
+                                                className='btn btn-block'
+                                                onClick={paymentHandler}
+                                            >
+                                                Pagar com {order.paymentMethod}
+                                            </Button>
                                         </ListGroup.Item>
                                     )}
                                 </ListGroup>

@@ -6,9 +6,14 @@ from rest_framework.response import Response
 
 from base.models import Product, Order, OrderItem, ShippingAddress
 from base.serializers import ProductSerializer, OrderSerializer
+from base.payment_strategies import (
+    PaymentContext,
+    PaymentStrategyError,
+    get_payment_strategy,
+)
 
 from rest_framework import status
-from datetime import datetime
+from django.utils import timezone
 
 
 @api_view(['POST'])
@@ -22,6 +27,10 @@ def addOrderItems(request):
     if orderItems and len(orderItems) == 0:
         return Response({'detail': 'No Order Items'}, status=status.HTTP_400_BAD_REQUEST)
     else:
+        try:
+            get_payment_strategy(data['paymentMethod'])
+        except PaymentStrategyError as error:
+            return Response({'detail': str(error)}, status=status.HTTP_400_BAD_REQUEST)
 
         # (1) Create order
 
@@ -103,11 +112,18 @@ def getOrderById(request, pk):
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def updateOrderToPaid(request, pk):
-    order = Order.objects.get(_id=pk)
+    try:
+        order = Order.objects.get(_id=pk)
+    except Order.DoesNotExist:
+        return Response({'detail': 'Order does not exist'}, status=status.HTTP_400_BAD_REQUEST)
 
-    order.isPaid = True
-    order.paidAt = datetime.now()
-    order.save()
+    try:
+        payment_method = request.data.get('paymentMethod', order.paymentMethod)
+        payment_strategy = get_payment_strategy(payment_method)
+        payment_context = PaymentContext(payment_strategy)
+        payment_context.pay(order, request.data)
+    except PaymentStrategyError as error:
+        return Response({'detail': str(error)}, status=status.HTTP_400_BAD_REQUEST)
 
     return Response('Order was paid')
 
@@ -118,7 +134,7 @@ def updateOrderToDelivered(request, pk):
     order = Order.objects.get(_id=pk)
 
     order.isDelivered = True
-    order.deliveredAt = datetime.now()
+    order.deliveredAt = timezone.now()
     order.save()
 
     return Response('Order was delivered')
