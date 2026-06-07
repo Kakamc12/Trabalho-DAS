@@ -12,22 +12,39 @@ class PaymentStrategy(ABC):
     def pay(self, order, payment_result):
         pass
 
-
-class PixPaymentStrategy(PaymentStrategy):
-    def pay(self, order, payment_result):
-        if order.isPaid:
-            raise PaymentStrategyError('Order is already paid')
-
+    def validate_payment_status(self, payment_result):
         payment_status = payment_result.get('status') if payment_result else None
 
         if payment_status and payment_status.upper() not in ['COMPLETED', 'APPROVED']:
-            raise PaymentStrategyError('Pix payment was not completed')
+            raise PaymentStrategyError('Payment was not completed')
+
+    def mark_order_as_paid(self, order):
+        if order.isPaid:
+            raise PaymentStrategyError('Order is already paid')
 
         order.isPaid = True
         order.paidAt = timezone.now()
         order.save()
 
         return order
+
+
+class PixPaymentStrategy(PaymentStrategy):
+    def pay(self, order, payment_result):
+        self.validate_payment_status(payment_result)
+        return self.mark_order_as_paid(order)
+
+
+class CreditCardPaymentStrategy(PaymentStrategy):
+    def pay(self, order, payment_result):
+        self.validate_payment_status(payment_result)
+        return self.mark_order_as_paid(order)
+
+
+class BoletoPaymentStrategy(PaymentStrategy):
+    def pay(self, order, payment_result):
+        self.validate_payment_status(payment_result)
+        return self.mark_order_as_paid(order)
 
 
 class PaymentContext:
@@ -40,6 +57,9 @@ class PaymentContext:
 
 PAYMENT_STRATEGIES = {
     'pix': PixPaymentStrategy,
+    'cartao de credito': CreditCardPaymentStrategy,
+    'credit card': CreditCardPaymentStrategy,
+    'boleto': BoletoPaymentStrategy,
 }
 
 
