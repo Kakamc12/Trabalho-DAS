@@ -6,6 +6,7 @@ import Message from '../components/Message'
 import Loader from '../components/Loader'
 import { getOrderDetails, payOrder, deliverOrder } from '../actions/orderActions'
 import { ORDER_PAY_RESET, ORDER_DELIVER_RESET } from '../constants/orderConstants'
+import { getPaymentMethodLabel } from '../constants/paymentMethods'
 
 function OrderScreen({ match, history }) {
     const orderId = match.params.id
@@ -89,7 +90,7 @@ function OrderScreen({ match, history }) {
                                     <h2>Payment Method</h2>
                                     <p>
                                         <strong>Method: </strong>
-                                        {order.paymentMethod}
+                                        {getPaymentMethodLabel(order.paymentMethod)}
                                     </p>
                                     {order.isPaid ? (
                                         <Message variant='success'>Paid on {order.paidAt}</Message>
@@ -175,7 +176,7 @@ function OrderScreen({ match, history }) {
                                                 className='btn btn-block'
                                                 onClick={paymentHandler}
                                             >
-                                                Pagar com {order.paymentMethod}
+                                                Pagar com {getPaymentMethodLabel(order.paymentMethod)}
                                             </Button>
                                         </ListGroup.Item>
                                     )}

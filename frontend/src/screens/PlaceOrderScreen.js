@@ -6,6 +6,7 @@ import Message from '../components/Message'
 import CheckoutSteps from '../components/CheckoutSteps'
 import { createOrder } from '../actions/orderActions'
 import { ORDER_CREATE_RESET } from '../constants/orderConstants'
+import { getPaymentMethodLabel } from '../constants/paymentMethods'
 
 function PlaceOrderScreen({ history }) {
 
@@ -69,7 +70,7 @@ function PlaceOrderScreen({ history }) {
                             <h2>Payment Method</h2>
                             <p>
                                 <strong>Method: </strong>
-                                {cart.paymentMethod}
+                                {getPaymentMethodLabel(cart.paymentMethod)}
                             </p>
                         </ListGroup.Item>
 

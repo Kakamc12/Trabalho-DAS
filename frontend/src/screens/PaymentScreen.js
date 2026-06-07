@@ -1,9 +1,14 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { Form, Button, Col } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
 import FormContainer from '../components/FormContainer'
 import CheckoutSteps from '../components/CheckoutSteps'
 import { savePaymentMethod } from '../actions/cartActions'
+import {
+    DEFAULT_PAYMENT_METHOD,
+    PAYMENT_METHODS,
+    isSupportedPaymentMethod,
+} from '../constants/paymentMethods'
 
 function PaymentScreen({ history }) {
 
@@ -12,7 +17,9 @@ function PaymentScreen({ history }) {
 
     const dispatch = useDispatch()
 
-    const [paymentMethod, setPaymentMethod] = useState('Pix')
+    const [paymentMethod, setPaymentMethod] = useState(
+        isSupportedPaymentMethod(cart.paymentMethod) ? cart.paymentMethod : DEFAULT_PAYMENT_METHOD
+    )
 
     if (!shippingAddress.address) {
         history.push('/shipping')
@@ -32,41 +39,20 @@ function PaymentScreen({ history }) {
                 <Form.Group>
                     <Form.Label as='legend'>Select Method</Form.Label>
                     <Col>
-                        <Form.Check
-                            type='radio'
-                            label='Pix'
-                            id='pix'
-                            name='paymentMethod'
-                            value='Pix'
-                            checked={paymentMethod === 'Pix'}
-                            onChange={(e) => setPaymentMethod(e.target.value)}
-                        >
+                        {PAYMENT_METHODS.map(method => (
+                            <Form.Check
+                                key={method.value}
+                                type='radio'
+                                label={method.label}
+                                id={method.value}
+                                name='paymentMethod'
+                                value={method.value}
+                                checked={paymentMethod === method.value}
+                                onChange={(e) => setPaymentMethod(e.target.value)}
+                            >
 
-                        </Form.Check>
-
-                        <Form.Check
-                            type='radio'
-                            label='Cartao de Credito'
-                            id='credit-card'
-                            name='paymentMethod'
-                            value='Cartao de Credito'
-                            checked={paymentMethod === 'Cartao de Credito'}
-                            onChange={(e) => setPaymentMethod(e.target.value)}
-                        >
-
-                        </Form.Check>
-
-                        <Form.Check
-                            type='radio'
-                            label='Boleto'
-                            id='boleto'
-                            name='paymentMethod'
-                            value='Boleto'
-                            checked={paymentMethod === 'Boleto'}
-                            onChange={(e) => setPaymentMethod(e.target.value)}
-                        >
-
-                        </Form.Check>
+                            </Form.Check>
+                        ))}
                     </Col>
                 </Form.Group>
 

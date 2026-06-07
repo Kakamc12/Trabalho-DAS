@@ -57,6 +57,7 @@ class PaymentContext:
 
 PAYMENT_STRATEGIES = {
     'pix': PixPaymentStrategy,
+    'cartao': CreditCardPaymentStrategy,
     'cartao de credito': CreditCardPaymentStrategy,
     'credit card': CreditCardPaymentStrategy,
     'boleto': BoletoPaymentStrategy,
@@ -67,6 +68,6 @@ def get_payment_strategy(payment_method):
     strategy_class = PAYMENT_STRATEGIES.get((payment_method or '').strip().lower())
 
     if not strategy_class:
-        raise PaymentStrategyError('Payment method is not supported')
+        raise PaymentStrategyError('Payment method is not supported. Use pix, cartao, or boleto.')
 
     return strategy_class()
