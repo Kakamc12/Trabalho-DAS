@@ -35,6 +35,15 @@ Original project can be found [here](https://github.com/dennisivy/proshop_django
 * 7 - `npm install`
 * 8 - `python manage.py runserver`
 
+
+### Administrator 
+
+* 1- Go to the terminal type `python manage.py createsuperuser`
+* 2- Prove your username, email and password (Recommended at least 8 characters with uppercase, lower case and numbers)
+* 3- `python manage.py runserver`
+* 4- Go to http://127.0.0.1:8000/admin
+* 5- Insert your email and password
+
 ## PT-BR
 Projeto original poderá ser encontrado [aqui](https://github.com/dennisivy/proshop_django).
 
@@ -67,3 +76,11 @@ Projeto original poderá ser encontrado [aqui](https://github.com/dennisivy/pros
 * 6 - Instale os modulos do React `cd frontend`
 * 7 - `npm install`
 * 8 - `python manage.py runserver`
+
+### Administrador: 
+
+* 1- No terminal digite `python manage.py createsuperuser`
+* 2- Digite usuario, email, e senha conforme for pedido (Recomendado 8 characteres, letras maiusculas, minusculas e numeros)
+* 3- `python manage.py runserver`
+* 4- Va para http://127.0.0.1:8000/admin
+* 5- Preencha com email e senha
